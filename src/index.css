@@ -61,3 +61,29 @@ code {
   [data-theme="dark"] .site-layout-content {
     background: #141414;
   }
+.conf{
+  
+  float: right;
+  top: 20%;
+
+}
+
+.logout{
+  
+  float: right;
+  top: 20%; 
+  right: 2%;
+}
+
+.form{
+  justify-content:center
+}
+
+
+.site-layout-sub-header-background {
+  background: #fff;
+}
+
+.site-layout-background {
+  background: #fff;
+}

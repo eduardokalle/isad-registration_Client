@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Row, Col, Select, Layout, Menu, Breadcrumb , Image } from 'antd';
+import { Row, Col, Select, Layout, Menu, Breadcrumb , Image} from 'antd';
+import { Link } from 'react-router-dom';
 import 'antd/dist/antd.css';
-import './index.css';
 import swal from 'sweetalert';
 import { Form, Input, InputNumber, Button } from 'antd';
+import Config  from "../pages/passW";
+
 
 const { Header, Content, Footer } = Layout;
 
@@ -50,36 +52,65 @@ const validateMessages = {
 };
 
 const Demo = () => {
+  const [cultos, setCultos] = useState([]);
+  const [iglesia, setIglesia ] = useState([]);
+
+  useEffect(() => (
+    axios.get('https://isad-egistration-api.herokuapp.com/api/worship/', {})
+    .then(function (response) {
+      console.log( 'worship response == ',response);
+      setCultos(response?.data || []);
+    })
+    .catch(function (error) {
+      console.log('worship error == ',error);
+
+    })
+  ), []);
+
+  useEffect(() => (
+    axios.get('https://isad-egistration-api.herokuapp.com/api/church/', {})
+    .then(function (response) {
+      console.log( 'church response == ',response);
+      setIglesia(response?.data || []);
+    })
+    .catch(function (error) {
+      console.log('church error == ',error);
+
+    })
+  ), []);
+
   const onFinish = (values) => {
     console.log(values);
     axios.post('https://isad-egistration-api.herokuapp.com/api/registration/', {
-                cedula: values.cedula,
-                nombre: values.nombre,
-                apellido: values.apellido,
-                iglesia: values.iglesia,
-                culto:  values.culto
-            })  
-            .then(function (response) {
-              console.log(response);
-                if (response.status == 200) {
-                  swal(response.data.message , "Haz clic en el botón!", "success");
-                }else{
-                  swal("Ha ocurrido un error", "Haz clic en el botón!", "error");
-                }
-            })
-            .catch(function (error) {
-              console.log(error);
-              swal("Ha ocurrido un error", "Haz clic en el botón!", "error");
+        cedula: values.cedula,
+        nombre: values.nombre,
+        apellido: values.apellido,
+        fecha: values.fecha,
+        iglesia: values.iglesia,
+        culto:  values.culto
+    })  
+    .then(function (response) {
+      console.log(response);
+        if (response.status == 200) {
+          swal(response.data.message , "Haz clic en el botón!", "success");
+        }else{
+          swal("Ha ocurrido un error", "Haz clic en el botón!", "error");
+        }
+    })
+    .catch(function (error) {
+      console.log(error);
+      swal("Ha ocurrido un error", "Haz clic en el botón!", "error");
 
-            })
+    })
   };
 
-
   return (
+     
     <>
       <Layout className="layout">
         <Header>  
           <div className="logo" />
+            <Config/>
             <Menu theme="dark" mode="horizontal">
             </Menu>
         </Header>
@@ -88,9 +119,8 @@ const Demo = () => {
               <Row justify='center'>
                 <Col span={24} justify='center'>Registro IASD </Col>
               </Row>
-              <Row>
-                <Col span={8}></Col>  
-                <Col span={8} justify="space-around" align="middle" className='height : 100%'>
+              <Row className='form'> 
+                <Col>
                     <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
                       <Form.Item
                         name={'cedula'}
@@ -115,7 +145,7 @@ const Demo = () => {
                           },
                         ]}
                       >
-                        <Input />
+                        <Input style={{ width: 200 }} />
                       </Form.Item>
                       <Form.Item
                         name={'apellido'}
@@ -126,7 +156,36 @@ const Demo = () => {
                           },
                         ]}
                       >
-                        <Input />
+                        <Input  style={{ width: 200 }}/>
+                      </Form.Item>
+                      <Form.Item
+                          name={'fecha'}
+                          label="Fecha"
+                          rules={[
+                            {
+                              required: true,
+                            },
+                          ]}
+                      >
+                        <Select    
+                          showSearch
+                          style={{ width: 200 }}
+                          placeholder="Selecciona tu fecha del culto"
+                          optionFilterProp="children"
+                          //onChange={onChange}
+                          onFocus={onFocus}
+                          onBlur={onBlur}
+                          onSearch={onSearch}
+                          
+                        >
+                          { cultos.map(item => {
+                            return (
+                              <Option key={item.fecha}>
+                                {item.fecha}
+                              </Option>
+                            );
+                          })}
+                        </Select>
                       </Form.Item>
                       <Form.Item
                           name={'iglesia'}
@@ -146,14 +205,15 @@ const Demo = () => {
                           onFocus={onFocus}
                           onBlur={onBlur}
                           onSearch={onSearch}
-                          filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
+                          
                         >
-                          <Option value="Canaan">Canaan</Option>
-                          <Option value="La union">La union</Option>
-                          <Option value="Peniel">Peniel</Option>
-                          <Option value="Salem">Salem</Option>
+                           { iglesia.map(item => {
+                            return (
+                              <Option key={item.nombre}>
+                                {item.nombre}
+                              </Option>
+                            );
+                          })}
                         </Select>
                       </Form.Item>
                       <Form.Item
@@ -174,13 +234,14 @@ const Demo = () => {
                           onFocus={onFocus}
                           onBlur={onBlur}
                           onSearch={onSearch}
-                          filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
                         >
-                          <Option value="1 Culto">1er Culto</Option>
-                          <Option value="2 Culto">2do Culto</Option>
-                          <Option value="Culto joven">Culto Joven</Option>
+                          { cultos.map(item => {
+                            return (
+                              <Option key={item.session}>
+                                {item.session}
+                              </Option>
+                            );
+                          })}
                         </Select>
                       </Form.Item>
                       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
@@ -190,7 +251,6 @@ const Demo = () => {
                       </Form.Item>
                     </Form>
                 </Col>
-                <Col span={8}></Col>
               </Row>
             </div>
         </Content> 
