@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router';
 import 'antd/dist/antd.css';
 import swal from 'sweetalert';
 import { SettingOutlined } from '@ant-design/icons';
-import { Form, Input, InputNumber, Modal, Button  } from 'antd';
-import '../assets/dashboard.css'
+import { Form, Input, Modal, Button  } from 'antd';
+import '../assets/dashboard.css' 
 
 class passW extends React.Component {
 
@@ -21,7 +21,9 @@ class passW extends React.Component {
     };
 
     handleOk = () => {
-        this.setState({ loading: true });
+        this.setState({  
+            loading: true,
+        });
         setTimeout(() => {
         this.setState({ loading: false, visible: false });
         }, 3000);
@@ -31,14 +33,18 @@ class passW extends React.Component {
         this.setState({ visible: false });
     };
 
-    passEnviar = () => {
-      
+    onFinish = (values) =>{
+      console.log(values.pass);
+      if (values.pass == '45FK') {
+        console.log('XXXX', values.pass);
+        return <Redirect to="/dashboard" />;
+      }else{
+        swal("Error!", "El codigo es incorrecto!", "error");
+      }
     }
-
-    handleChange(e) { console.log(e.target.value) }
-
+    
     render () {
-
+      
         const { visible, loading } = this.state;
 
         return (
@@ -49,19 +55,26 @@ class passW extends React.Component {
                 <Modal
                 visible={visible}
                 title="Administración"
-                onOk={this.handleChange}
                 onCancel={this.handleCancel}
                 footer={[
                     <Button key="back" onClick={this.handleCancel}>
                     Retroceder
-                    </Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleChange}>
-                    Enviar
-                    </Button>,
+                    </Button>
                 ]}
                 >
-                <Input size="large"  onChange={this.handleChange}/>
-                <p>Ingresa el codigo para ingresar a la administacion</p>
+                <Form onFinish={this.onFinish}>   
+                <Form.Item
+                    name={'pass'}
+                >  
+                    <Input size="large"/>
+                </Form.Item>    
+                        <p>Ingresa el codigo para ingresar a la administacion</p>
+                <Form.Item>          
+                    <Button key="submit" type="primary" htmlType="submit" loading={loading}>
+                        Enviar
+                    </Button>
+                </Form.Item> 
+                </Form> 
                 </Modal>
         </>  
 

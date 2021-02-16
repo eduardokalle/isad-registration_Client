@@ -70,7 +70,7 @@ function Worship () {
 
         return (
                 <>
-                  <h3>Citas</h3>
+                  <h3>Registro de cultos</h3>
                   {loading ? <LoadSpinner /> :    <Table columns={columns} dataSource={data} scroll={{ x: 1300 }} />  }
                    
                 </>
